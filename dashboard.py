@@ -124,19 +124,18 @@ fig1 = plot_series(
     df_monthly["Mois"], df_monthly["Followers"],
     "Followers", "Followers", "tab:blue"
 )
+st.pyplot(fig1)
 
 fig2 = plot_series(
     df_monthly["Mois"], df_monthly["Visites"],
     "Visites profil", "Visites", "tab:orange"
 )
+st.pyplot(fig2)
 
 fig3 = plot_series(
     df_monthly["Mois"], df_monthly["Vues"],
     "Vues contenu", "Vues", "tab:green"
 )
-
-st.pyplot(fig1)
-st.pyplot(fig2)
 st.pyplot(fig3)
 
 # --- Export PDF ---
