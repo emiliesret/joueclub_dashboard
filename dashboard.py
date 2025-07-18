@@ -7,7 +7,7 @@ import tempfile
 
 # --- Page Configuration ---
 st.set_page_config(page_title="Dashboard JoueClub Nice", layout="wide")
-st.title("Dashboard Communication & Animations — JoueClub Nice")
+st.title("Dashboard Communication — JoueClub Nice")
 
 # --- Sidebar: Data Uploads ---
 st.sidebar.header("Importer tes données")
