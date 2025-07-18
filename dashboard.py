@@ -50,21 +50,9 @@ st.markdown(f"**Période d’étude :** {start} – {end}")
 # --- KPI Principaux ---
 st.header("KPI principaux")
 c1, c2, c3 = st.columns(3)
-c1.metric(
-    "Total Followers",
-    f"{int(agg_f.sum()):,}",
-    help="Total des nouveaux abonnés sur la période."
-)
-c2.metric(
-    "Total Visites",
-    f"{int(agg_v.sum()):,}",
-    help="Total des visites de profil générées."
-)
-c3.metric(
-    "Total Vues",
-    f"{int(agg_w.sum()):,}",
-    help="Total des impressions de contenu."
-)
+c1.metric("Total Followers", f"{int(agg_f.sum()):,}", help="Total des nouveaux abonnés sur la période.")
+c2.metric("Total Visites",   f"{int(agg_v.sum()):,}", help="Total des visites de profil générées.")
+c3.metric("Total Vues",      f"{int(agg_w.sum()):,}", help="Total des impressions de contenu.")
 
 # --- KPI Additionnels ---
 st.markdown("### KPI additionnels")
@@ -78,27 +66,11 @@ avg_growth = growth.mean()
 idx_peak   = growth.idxmax()
 peak_month = df_monthly.loc[idx_peak,"Mois"].strftime("%b %Y") if not growth.empty else "-"
 c4, c5, c6 = st.columns(3)
-c4.metric(
-    "Conv. Followers/Vues",
-    f"{conv_f:.2f}%",
-    help="Pourcentage de vues menant à un nouvel abonné."
-)
-c5.metric(
-    "Conv. Visites/Vues",
-    f"{conv_v:.2f}%",
-    help="Pourcentage de vues menant à une visite de profil."
-)
-c6.metric(
-    "Croissance mensuelle",
-    f"{avg_growth:.0f} foll/mois",
-    help="Gain moyen de nouveaux abonnés par mois."
-)
-c7, _ = st.columns([1,2])
-c7.metric(
-    "Mois de pic growth",
-    peak_month,
-    help="Mois avec le plus fort gain d’abonnés."
-)
+c4.metric("Conv. Followers/Vues", f"{conv_f:.2f}%",           help="Pourcentage de vues menant à un nouvel abonné.")
+c5.metric("Conv. Visites/Vues",   f"{conv_v:.2f}%",           help="Pourcentage de vues menant à une visite de profil.")
+c6.metric("Croissance mensuelle", f"{avg_growth:.0f} foll/mois", help="Gain moyen de nouveaux abonnés par mois.")
+col7, _ = st.columns([1,2])
+col7.metric("Mois de pic growth", peak_month,                 help="Mois avec le plus fort gain d’abonnés.")
 
 # --- Data Table ---
 st.subheader("Données consolidées")
@@ -120,33 +92,29 @@ def plot_series(x, y, title, ylabel, color):
     return fig
 
 # --- Figures & Display ---
-fig1 = plot_series(
-    df_monthly["Mois"], df_monthly["Followers"],
-    "Followers", "Followers", "tab:blue"
-)
+fig1 = plot_series(df_monthly["Mois"], df_monthly["Followers"],
+                   "Followers", "Followers", "tab:blue")
 st.pyplot(fig1)
 
-fig2 = plot_series(
-    df_monthly["Mois"], df_monthly["Visites"],
-    "Visites profil", "Visites", "tab:orange"
-)
+fig2 = plot_series(df_monthly["Mois"], df_monthly["Visites"],
+                   "Visites profil", "Visites", "tab:orange")
 st.pyplot(fig2)
 
-fig3 = plot_series(
-    df_monthly["Mois"], df_monthly["Vues"],
-    "Vues contenu", "Vues", "tab:green"
-)
+fig3 = plot_series(df_monthly["Mois"], df_monthly["Vues"],
+                   "Vues contenu", "Vues", "tab:green")
 st.pyplot(fig3)
 
 # --- Export PDF ---
 st.header("Export PDF")
 if st.button("Générer le rapport PDF"):
+    # Sanitize title to ASCII-only
+    pdf_title = f"Rapport JoueClub Nice ({start} - {end})"
     pdf = FPDF('P','mm','A4')
     pdf.add_page()
 
-    # Titre
+    # Title
     pdf.set_font('Arial','B',16)
-    pdf.cell(0, 10, f"Rapport JoueClub Nice ({start} – {end})", ln=True, align='C')
+    pdf.cell(0, 10, pdf_title, ln=True, align='C')
     pdf.ln(5)
 
     # KPI Principaux
@@ -178,13 +146,15 @@ if st.button("Générer le rapport PDF"):
         pdf.ln(5)
         tmp.close()
 
-    add_figure("Followers", fig1)
+    add_figure("Followers",      fig1)
     add_figure("Visites profil", fig2)
-    add_figure("Vues contenu", fig3)
+    add_figure("Vues contenu",   fig3)
 
+    # Output PDF (ignore any remaining non-Latin-1 chars)
     pdf_bytes = pdf.output(dest='S').encode('latin-1', 'ignore')
     fname = f"rapport_joueclub_nice_{start.replace(' ','_')}_{end.replace(' ','_')}.pdf"
-    st.download_button("Télécharger le rapport PDF", pdf_bytes, file_name=fname, mime="application/pdf")
+    st.download_button("Télécharger le rapport PDF", pdf_bytes,
+                       file_name=fname, mime="application/pdf")
     st.success("Rapport PDF généré !")
 else:
     st.info("Clique sur le bouton pour générer le rapport PDF.")
